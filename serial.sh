@@ -2,9 +2,7 @@
 
 {
 
-while True; do
-    screen /dev/tty.usbmodem14201 115200
-    sleep 1
-done
+port=$(ls /dev/tty.usb*)
+screen "$port" 115200
 
 }
