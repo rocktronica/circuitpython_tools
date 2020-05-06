@@ -36,7 +36,6 @@ function watch() {
     fsw -0 . | while read -d "" path
     do
         FILENAME=$(basename $path)
-        echo $FILENAME
 
         if [ "$FILENAME" == "$subject" ]; then
             deploy
