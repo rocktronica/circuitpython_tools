@@ -1,5 +1,10 @@
 #!/bin/bash
 
+shopt -s expand_aliases
+
+# TODO: uh, fix this
+alias mpy_cross="/Users/tommy/circuitpython/mpy-cross/mpy-cross"
+
 {
 
 function help() {
@@ -25,11 +30,27 @@ device="/Volumes/CIRCUITPY"
 subject="main.py" # TODO: parameterize
 
 function deploy() {
-    echo "SYNCING"
+    rm -rf "_build/"
+
+    # Compile .py files to .mpy and move to _build
+    for file in lib/*.py lib/**/*.py; do
+        path_without_extension=$(echo "$file" | cut -f 1 -d '.')
+        mpy_path="$path_without_extension.mpy"
+        echo "$file ->  $mpy_path"
+        mpy_cross $file
+        mkdir -p "$(dirname "_build/$file")"
+        mv -f -v "$mpy_path" "_build/$mpy_path"
+    done
+
+    # Copy subject and any remaining .mpy files to _build
+    for file in "$subject" lib/*.mpy lib/**/*.mpy; do
+        cp -v "$file" "_build/$file"
+    done
+
     rsync \
         --archive --verbose --compress \
-        "$subject" \
-        /Volumes/CIRCUITPY/
+        "_build/" \
+        "$device"
 }
 
 function watch() {
