@@ -31,6 +31,7 @@ subject="main.py" # TODO: parameterize
 
 function deploy() {
     rm -rf "_build/"
+    mkdir "_build/"
 
     # Compile .py files to .mpy and move to _build
     for file in lib/*.py lib/**/*.py; do
@@ -47,10 +48,17 @@ function deploy() {
         cp -v "$file" "_build/$file"
     done
 
+    # Sync subject
     rsync \
         --archive --verbose --compress \
-        "_build/" \
+        "_build/$subject" \
         "$device"
+
+    # Fully sync lib folder, deleting alien files
+    rsync \
+        --archive --verbose --compress --delete \
+        "_build/lib/" \
+        "$device/lib"
 }
 
 function watch() {
