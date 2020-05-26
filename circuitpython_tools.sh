@@ -13,6 +13,7 @@ Collection of tools to make working with CircuitPython boards easier.
 
 Usage:
 $(basename $0) -h
+$(basename $0) build
 $(basename $0) deploy
 $(basename $0) watch
 $(basename $0) serial"
@@ -29,7 +30,7 @@ port=$(ls /dev/tty.usb*)
 device="/Volumes/CIRCUITPY"
 subject="main.py" # TODO: parameterize
 
-function deploy() {
+function build() {
     rm -rf "_build/"
     mkdir "_build/"
 
@@ -52,6 +53,10 @@ function deploy() {
             cp -v "$file" "_build/$file"
         done
     fi
+}
+
+function deploy() {
+    build
 
     # Sync subject
     rsync \
@@ -97,6 +102,8 @@ fi
 if [ -z "$COMMAND" ]; then
     help
     exit
+elif [ "$COMMAND" == "build" ]; then
+    build
 elif [ "$COMMAND" == "deploy" ]; then
     deploy
 elif [ "$COMMAND" == "watch" ]; then
