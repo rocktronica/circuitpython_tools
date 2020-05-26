@@ -33,20 +33,25 @@ function deploy() {
     rm -rf "_build/"
     mkdir "_build/"
 
-    # Compile .py files to .mpy and move to _build
-    for file in lib/*.py lib/**/*.py; do
-        path_without_extension=$(echo "$file" | cut -f 1 -d '.')
-        mpy_path="$path_without_extension.mpy"
-        echo "$file ->  $mpy_path"
-        mpy_cross $file
-        mkdir -p "$(dirname "_build/$file")"
-        mv -f -v "$mpy_path" "_build/$mpy_path"
-    done
+    if [ -z "$(alias | grep mpy_cross)" ]; then
+        # Plain copy stuff to _build, w/o actually building
+        cp -r "$subject" lib _build
+    else
+        # Compile .py files to .mpy and move to _build
+        for file in lib/*.py lib/**/*.py; do
+            path_without_extension=$(echo "$file" | cut -f 1 -d '.')
+            mpy_path="$path_without_extension.mpy"
+            echo "$file ->  $mpy_path"
+            mpy_cross $file
+            mkdir -p "$(dirname "_build/$file")"
+            mv -f -v "$mpy_path" "_build/$mpy_path"
+        done
 
-    # Copy subject and any remaining .mpy files to _build
-    for file in "$subject" lib/*.mpy lib/**/*.mpy; do
-        cp -v "$file" "_build/$file"
-    done
+        # Copy subject and any remaining .mpy files to _build
+        for file in "$subject" lib/*.mpy lib/**/*.mpy; do
+            cp -v "$file" "_build/$file"
+        done
+    fi
 
     # Sync subject
     rsync \
