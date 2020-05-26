@@ -16,7 +16,8 @@ $(basename $0) -h
 $(basename $0) build
 $(basename $0) deploy
 $(basename $0) watch
-$(basename $0) serial"
+$(basename $0) serial
+$(basename $0) eject"
 }
 
 COMMAND="$1"
