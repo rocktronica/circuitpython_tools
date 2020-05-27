@@ -1,10 +1,5 @@
 #!/bin/bash
 
-shopt -s expand_aliases
-
-# TODO: uh, fix this
-alias mpy_cross="/Users/tommy/circuitpython/mpy-cross/mpy-cross"
-
 {
 
 function help() {
@@ -17,7 +12,11 @@ $(basename $0) build
 $(basename $0) deploy
 $(basename $0) watch
 $(basename $0) serial
-$(basename $0) eject"
+$(basename $0) eject
+
+To get smaller build files, install mpy-cross and expose it to cpt:
+export CPT_MPY_CROSS=\"/path/to/mpy-cross\"
+"
 }
 
 COMMAND="$1"
@@ -35,7 +34,7 @@ function build() {
     rm -rf "_build/"
     mkdir "_build/"
 
-    if [ -z "$(alias | grep mpy_cross)" ]; then
+    if [ -z "$CPT_MPY_CROSS" ]; then
         # Plain copy stuff to _build, w/o actually building
         cp -rv "$subject" lib _build
     else
@@ -44,7 +43,7 @@ function build() {
             path_without_extension=$(echo "$file" | cut -f 1 -d '.')
             mpy_path="$path_without_extension.mpy"
             echo "$file ->  $mpy_path"
-            mpy_cross $file
+            $CPT_MPY_CROSS $file
             mkdir -p "$(dirname "_build/$file")"
             mv -f -v "$mpy_path" "_build/$mpy_path"
         done
