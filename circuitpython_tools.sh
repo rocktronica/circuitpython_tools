@@ -37,7 +37,7 @@ function build() {
 
     if [ -z "$(alias | grep mpy_cross)" ]; then
         # Plain copy stuff to _build, w/o actually building
-        cp -r "$subject" lib _build
+        cp -rv "$subject" lib _build
     else
         # Compile .py files to .mpy and move to _build
         for file in lib/*.py lib/**/*.py; do
