@@ -92,6 +92,11 @@ function eject() {
     diskutil eject CIRCUITPY
 }
 
+if [ -z "$COMMAND" ]; then
+    help
+    exit
+fi
+
 if [ -z "$port" ] || [ -z "$(test -d "$device" && echo .)" ]; then
     echo "Couldn't find device. Exiting."
     exit
@@ -100,10 +105,7 @@ else
     echo
 fi
 
-if [ -z "$COMMAND" ]; then
-    help
-    exit
-elif [ "$COMMAND" == "build" ]; then
+if [ "$COMMAND" == "build" ]; then
     build
 elif [ "$COMMAND" == "deploy" ]; then
     deploy
