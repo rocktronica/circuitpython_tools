@@ -7,12 +7,12 @@ function help() {
 Collection of tools to make working with CircuitPython boards easier.
 
 Usage:
-$(basename $0) -h
-$(basename $0) build
-$(basename $0) deploy
-$(basename $0) watch
-$(basename $0) serial
-$(basename $0) eject
+$(basename $0) -h       # show this message
+$(basename $0) build    # make _build folder, ready for deployment
+$(basename $0) deploy   # actually deploy ^ to device
+$(basename $0) watch    # watch for changes to automatically build and deploy
+$(basename $0) serial   # connect to device's serial console
+$(basename $0) eject    # eject/unmount USB drive so it can be unplugged
 
 To get smaller build files, install mpy-cross and expose it to cpt:
 export CPT_MPY_CROSS=\"/path/to/mpy-cross\"
