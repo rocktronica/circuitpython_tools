@@ -2,6 +2,8 @@
 
 {
 
+set -e # stop script on error
+
 function help() {
     echo "\
 Collection of tools to make working with CircuitPython boards easier.
