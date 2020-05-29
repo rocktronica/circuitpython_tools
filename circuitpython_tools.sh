@@ -8,6 +8,7 @@ Collection of tools to make working with CircuitPython boards easier.
 
 Usage:
 $(basename $0) -h       # show this message
+$(basename $0) open     # open USB device in Finder
 $(basename $0) build    # make _build folder, ready for deployment
 $(basename $0) deploy   # actually deploy ^ to device
 $(basename $0) watch    # watch for changes to automatically build and deploy
@@ -91,6 +92,10 @@ function _eject() {
     diskutil eject CIRCUITPY
 }
 
+function _open() {
+  open "$device"
+}
+
 if [ -z "$COMMAND" ]; then
     help
     exit
@@ -106,6 +111,8 @@ fi
 
 if [ "$COMMAND" == "build" ]; then
     _build
+elif [ "$COMMAND" == "open" ]; then
+    _open
 elif [ "$COMMAND" == "deploy" ]; then
     _deploy
 elif [ "$COMMAND" == "watch" ]; then
