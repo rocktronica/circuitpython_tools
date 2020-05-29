@@ -30,7 +30,7 @@ port=$(ls /dev/tty.usb*)
 device="/Volumes/CIRCUITPY"
 subject="main.py" # TODO: parameterize
 
-function build() {
+function _build() {
     rm -rf "_build/"
     mkdir "_build/"
 
@@ -55,8 +55,8 @@ function build() {
     fi
 }
 
-function deploy() {
-    build
+function _deploy() {
+    _build
 
     # Sync subject
     rsync \
@@ -71,23 +71,23 @@ function deploy() {
         "$device/lib"
 }
 
-function watch() {
+function _watch() {
     fsw -0 . | while read -d "" path
     do
         FILENAME=$(basename $path)
 
         if [ "$FILENAME" == "$subject" ]; then
-            deploy
+            _deploy
         fi
     done
 }
 
-function serial() {
+function _serial() {
     NAME="cpt_serial"
     screen -r "$NAME" || screen -S "$NAME" "$port" 115200
 }
 
-function eject() {
+function _eject() {
     diskutil eject CIRCUITPY
 }
 
@@ -105,15 +105,15 @@ else
 fi
 
 if [ "$COMMAND" == "build" ]; then
-    build
+    _build
 elif [ "$COMMAND" == "deploy" ]; then
-    deploy
+    _deploy
 elif [ "$COMMAND" == "watch" ]; then
-    watch
+    _watch
 elif [ "$COMMAND" == "serial" ]; then
-    serial
+    _serial
 elif [ "$COMMAND" == "eject" ]; then
-    eject
+    _eject
 else
     echo "Unkown command: $COMMAND"
 fi
