@@ -41,14 +41,15 @@ function _build() {
         # Plain copy stuff to _build, w/o actually building
         cp -rv "$subject" lib _build
     else
-        # Compile .py files to .mpy and move to _build
+        # Compile .py files to _build/__.mpy
         for file in lib/*.py lib/**/*.py; do
             path_without_extension=$(echo "$file" | cut -f 1 -d '.')
             mpy_path="$path_without_extension.mpy"
+
             echo "$file ->  $mpy_path"
-            $CPT_MPY_CROSS $file
+
             mkdir -p "$(dirname "_build/$file")"
-            mv -f -v "$mpy_path" "_build/$mpy_path"
+            $CPT_MPY_CROSS $file -o "_build/$mpy_path"
         done
 
         # Copy subject and any remaining .mpy files to _build
@@ -75,13 +76,10 @@ function _deploy() {
 }
 
 function _watch() {
-    fsw -0 . | while read -d "" path
+    fsw -0 "$subject" "lib" | while read -d "" path
     do
-        FILENAME=$(basename $path)
-
-        if [ "$FILENAME" == "$subject" ]; then
-            _deploy
-        fi
+        echo "CHANGED: $path"
+        _deploy
     done
 }
 
