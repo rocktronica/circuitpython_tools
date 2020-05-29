@@ -33,6 +33,17 @@ port=$(ls /dev/tty.usb*)
 device="/Volumes/CIRCUITPY"
 subject="main.py" # TODO: parameterize
 
+function _compile_file() {
+    path="$1"
+    path_without_extension=$(echo "$path" | cut -f 1 -d '.')
+    mpy_path="_build/$path_without_extension.mpy"
+
+    echo "$path ->  $mpy_path"
+
+    mkdir -p "$(dirname "$mpy_path")"
+    $CPT_MPY_CROSS $path -o "$mpy_path"
+}
+
 function _build() {
     rm -rf "_build/"
     mkdir "_build/"
@@ -43,13 +54,7 @@ function _build() {
     else
         # Compile .py files to _build/__.mpy
         for file in lib/*.py lib/**/*.py; do
-            path_without_extension=$(echo "$file" | cut -f 1 -d '.')
-            mpy_path="$path_without_extension.mpy"
-
-            echo "$file ->  $mpy_path"
-
-            mkdir -p "$(dirname "_build/$file")"
-            $CPT_MPY_CROSS $file -o "_build/$mpy_path"
+            _compile_file "$file"
         done
 
         # Copy subject and any remaining .mpy files to _build
@@ -59,9 +64,7 @@ function _build() {
     fi
 }
 
-function _deploy() {
-    _build
-
+function _sync() {
     # Sync subject
     rsync \
         --archive --verbose --compress \
@@ -78,8 +81,15 @@ function _deploy() {
 function _watch() {
     fsw -0 "$subject" "lib" | while read -d "" path
     do
-        echo "CHANGED: $path"
-        _deploy
+        relative_path="${path#"$PWD/"}"
+
+        if [ "$relative_path" == "$subject" ]; then
+            cp -v "$relative_path" "_build/$relative_path"
+        else
+            _compile_file "$relative_path"
+        fi
+
+        _sync
     done
 }
 
@@ -114,7 +124,8 @@ if [ "$COMMAND" == "build" ]; then
 elif [ "$COMMAND" == "open" ]; then
     _open
 elif [ "$COMMAND" == "deploy" ]; then
-    _deploy
+    _build
+    _sync
 elif [ "$COMMAND" == "watch" ]; then
     _watch
 elif [ "$COMMAND" == "serial" ]; then
