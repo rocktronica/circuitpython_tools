@@ -33,15 +33,22 @@ port=$(ls /dev/tty.usb*)
 device="/Volumes/CIRCUITPY"
 subject="main.py" # TODO: parameterize
 
-function _compile_file() {
+function _build_file() {
     path="$1"
+    extension="${path##*.}"
     path_without_extension=$(echo "$path" | cut -f 1 -d '.')
     mpy_path="_build/$path_without_extension.mpy"
 
-    echo "$path ->  $mpy_path"
-
     mkdir -p "$(dirname "$mpy_path")"
-    $CPT_MPY_CROSS $path -o "$mpy_path"
+
+    if [ "$path" == "$subject" ]; then
+        cp -v "$path" "_build/$path"
+    elif [ "$extension" == "mpy" ]; then
+        cp -v "$path" "_build/$path"
+    else
+        echo "$path ->  $mpy_path"
+        $CPT_MPY_CROSS $path -o "$mpy_path"
+    fi
 }
 
 function _build() {
@@ -52,14 +59,9 @@ function _build() {
         # Plain copy stuff to _build, w/o actually building
         cp -rv "$subject" lib _build
     else
-        # Compile .py files to _build/__.mpy
-        for file in lib/*.py lib/**/*.py; do
-            _compile_file "$file"
-        done
-
-        # Copy subject and any remaining .mpy files to _build
-        for file in "$subject" lib/*.mpy lib/**/*.mpy; do
-            cp -v "$file" "_build/$file"
+        # TODO: simplify
+        for file in "$subject" lib/*.py lib/**/*.py lib/*.mpy lib/**/*.mpy; do
+            _build_file "$file"
         done
     fi
 }
@@ -83,12 +85,7 @@ function _watch() {
     do
         relative_path="${path#"$PWD/"}"
 
-        if [ "$relative_path" == "$subject" ]; then
-            cp -v "$relative_path" "_build/$relative_path"
-        else
-            _compile_file "$relative_path"
-        fi
-
+        _build_file "$relative_path"
         _sync
     done
 }
