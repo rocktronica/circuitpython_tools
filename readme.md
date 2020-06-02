@@ -59,8 +59,12 @@ cpt watch
 
 cpt will watch for any changes you make locally to your Python files and automatically compile and deploy them to the device.
 
-## License
+## TODO
 
+* work with both `code.py` and `main.py`
+* expose rsync's dry-run or some way to confirm deployment changes w/o actually affecting device
+
+## License
 
 MIT License
 
